@@ -241,6 +241,7 @@ module "ctl" {
 
 output "configuration" {
   value = {
+    base = module.base.configuration
     srv = module.srv.configuration
     pxy = module.pxy.configuration
     cli-sles12sp4 = module.cli-sles12sp4.configuration
