@@ -40,7 +40,7 @@ mirror_configuration_dir:
 minima_configuration:
   file.managed:
     - name: /root/.minima/minima.yaml
-    - source: salt://mirror/minima.yaml
+    - source: salt://mirror/{{ grains.get("minima_config") | default("minima.yaml", true) }}
     - template: jinja
     - require:
       - file: mirror_configuration_dir
