@@ -6,6 +6,7 @@ include:
   - default.avahi
   - repos
 
+{% if not grains.get('no_install') | default(false) %}
 minimal_package_update:
   pkg.latest:
     - pkgs:
@@ -19,3 +20,4 @@ minimal_package_update:
       {% endif %}
 {% endif %}
     - order: last
+{% endif %}

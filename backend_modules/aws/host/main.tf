@@ -151,6 +151,10 @@ resource "null_resource" "host_salt_configuration" {
         reset_ids                     = true
         ipv6                          = var.ipv6
         data_disk_device              = contains(var.roles, "server") || contains(var.roles, "proxy") || contains(var.roles, "mirror") ? "xvdf" : null
+
+        // optimizations for cloud install
+        no_install = contains(var.roles, "server") ? true : false
+        no_update  = contains(var.roles, "mirror") ? true : false
       },
     var.grains))
     destination = "/tmp/grains"

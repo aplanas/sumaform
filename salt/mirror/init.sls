@@ -2,9 +2,14 @@ include:
   - default
 
 system_update:
+{% if not grains.get('no_update') | default(false) %}
   pkg.uptodate:
     - require:
       - sls: default
+{% else %}
+  pkg.installed:
+    - name: aaa_base
+{% endif %}
 
 mozilla_certificates:
   pkg.installed:
