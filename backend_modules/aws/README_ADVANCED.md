@@ -1,6 +1,5 @@
 # Advanced configurations
 
-
 ## mirror
 
 In addition to acting as a bastion host for all other instances, the `mirror` host serves all repos and packages used by other instances.
@@ -99,3 +98,34 @@ Steps:
 
 If one keeps the snapshot create resource in is root module, the snapshot will not be re-created unless one forces it by marking the resource as taint.
 To remove the older snapshot and create a new one run: `terraform taint aws_ebs_snapshot.mirror_data_snapshot`
+
+## re-use existing infrastructure
+
+One can deploy to existing pre-created infrastructure (VPC, networks, bastion) which should follow the pattern defined for the network. See README.md for more information.  
+To use it, a set of properties should be set on sumaform base module.
+
+| Variable name             | Type    | Default value | Description                                                      |
+|---------------------------|---------|---------------|------------------------------------------------------------------|
+| create_network            | boolean | `true`        | flag indicate if a new infrastructure should be created          |
+| public_subnet_id          | string  | `null`        | aws public subnet id                                             |
+| private_subnet_id         | string  | `null`        | aws private subnet id                                            |
+| public_security_group_id  | string  | `null`        | aws public security group id                                     |
+| private_security_group_id | string  | `null`        | aws private security group id                                    |
+| bastion_host              | string  | `null`        | bastion machine hostname (to access machines in private network) |          
+
+
+Example:
+```hcl
+module "base" {
+  source = "./modules/base"
+  ...
+  provider_settings = {
+    create_network            = false
+    public_subnet_id          = ...
+    private_subnet_id         = ...
+    public_security_group_id  = ...
+    private_security_group_id = ...
+    bastion_host              = ...
+  }
+}
+```   
