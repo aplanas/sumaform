@@ -1,0 +1,55 @@
+#cloud-config
+
+%{ if public_instance == "false" }
+#disable_root: false
+ssh_pwauth:   true
+# Add user to the system
+users:
+  - default
+  - name: uyuni
+    gecos: uyumi user
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    groups: users, admin
+    ssh_import_id: None
+    lock_passwd: false
+    passwd: $2a$07$5ft5kO0Jul4V3JXvffV9au6zCBtZUQCWEiUv8SoeXmH8z0F3GyilO
+%{ endif }
+
+%{ if image == "opensuse151" || image == "opensuse150"}
+packages: ["salt-minion"]
+
+runcmd:
+  # HACH for cloud image, since it has this package which blocks server deployment
+  - zypper rm -y gettext-runtime-mini
+  # HACH: machine already have some repos that where conflicting with the ones we want to install.
+  # Possible bug in zypper salt module
+  - zypper removerepo --all
+#  - echo "public_instance = ${public_instance}" > /tmp/public_instance
+
+%{ endif }
+
+%{ if image == "sles15"}
+
+zypper:
+  repos:
+    - id: os_pool_repo
+      name: os_pool_repo
+      baseurl: http://${mirror_url}/SUSE/Products/SLE-Module-Basesystem/15-SP1/x86_64/product
+      enabled: 1
+      autorefresh: 1
+
+packages: ["salt-minion"]
+%{ endif }
+%{ if image == "centos8" }
+yum_repos:
+  # repo for salt
+  tools_pool_repo:
+    baseurl: http://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Stable:/CentOS8-Uyuni-Client-Tools/CentOS_8/
+    failovermethod: priority
+    enabled: true
+    gpgcheck: false
+    name: tools_pool_repo
+    priority: 98
+
+packages: ["salt-minion"]
+%{ endif }

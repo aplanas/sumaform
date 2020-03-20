@@ -9,6 +9,48 @@ locals {
   ssh_user = lookup(var.provider_settings, "ssh_user", "ec2-user")
 }
 
+data "aws_ami" "opensuse150" {
+  most_recent      = true
+  name_regex       = "^openSUSE-Leap-15-v"
+  owners           = ["679593333241"]
+
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  filter {
+    name   = "root-device-type"
+    values = ["ebs"]
+  }
+}
+
+data "aws_ami" "opensuse151" {
+  most_recent      = true
+  name_regex       = "^openSUSE-Leap-15-1-v"
+  owners           = ["679593333241"]
+
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  filter {
+    name   = "root-device-type"
+    values = ["ebs"]
+  }
+}
+
 module "network" {
   source = "../network"
 
@@ -40,6 +82,10 @@ locals {
     key_name = local.key_name
     key_file = local.key_file
     ssh_user = local.ssh_user
+    images_ami = {
+      opensuse151 = data.aws_ami.opensuse151.image_id,
+      opensuse150 = data.aws_ami.opensuse150.image_id,
+      }
     },
   module.network.configuration)
 }
